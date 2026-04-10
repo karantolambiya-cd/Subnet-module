@@ -1,18 +1,28 @@
-name: Generate terraform docs
+name: Generate Terraform Docs
+
 on:
-  - pull_request
+  push:
+    branches: [ "master" ]
+  pull_request:
+
+permissions: 
+  contents: write  
+
 jobs:
   docs:
     runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-      with:
-        ref: ${{ github.event.pull_request.head.ref }}
 
-    - name: Render terraform docs inside the README.md and push changes back to PR branch
-      uses: terraform-docs/gh-actions@v1.4.1
-      with:
-        working-dir: .
-        output-file: README.md
-        output-method: inject
-        git-push: "true"
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true   # ✅ force new runtime
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4   # still ok for now
+
+      - name: Generate README with terraform-docs
+        uses: terraform-docs/gh-actions@v1.4.1   # ✅ update version
+        with:
+          working-dir: .
+          output-file: README.md
+          output-method: inject
+          git-push: true
